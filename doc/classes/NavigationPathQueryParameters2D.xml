@@ -10,8 +10,16 @@
 		<link title="Using NavigationPathQueryObjects">$DOCS_URL/tutorials/navigation/navigation_using_navigationpathqueryobjects.html</link>
 	</tutorials>
 	<members>
+		<member name="excluded_links" type="RID[]" setter="set_excluded_links" getter="get_excluded_links" default="[]">
+			The list of link [RID]s that will be excluded from the path query. Use [method NavigationLink2D.get_rid] to get the [RID] associated with a [NavigationLink2D] node. Excluded links are skipped during pathfinding so the resulting path will not traverse them.
+			[b]Note:[/b] The returned array is copied and any changes to it will not update the original property value. To update the value you need to modify the returned array, and then set it to the property again.
+		</member>
 		<member name="excluded_regions" type="RID[]" setter="set_excluded_regions" getter="get_excluded_regions" default="[]">
 			The list of region [RID]s that will be excluded from the path query. Use [method NavigationRegion2D.get_rid] to get the [RID] associated with a [NavigationRegion2D] node.
+			[b]Note:[/b] The returned array is copied and any changes to it will not update the original property value. To update the value you need to modify the returned array, and then set it to the property again.
+		</member>
+		<member name="included_links" type="RID[]" setter="set_included_links" getter="get_included_links" default="[]">
+			The list of link [RID]s that will be included by the path query. Use [method NavigationLink2D.get_rid] to get the [RID] associated with a [NavigationLink2D] node. If left empty all links are included. If a link ends up being both included and excluded at the same time it will be excluded.
 			[b]Note:[/b] The returned array is copied and any changes to it will not update the original property value. To update the value you need to modify the returned array, and then set it to the property again.
 		</member>
 		<member name="included_regions" type="RID[]" setter="set_included_regions" getter="get_included_regions" default="[]">

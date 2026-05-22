@@ -137,6 +137,38 @@ TypedArray<RID> NavigationPathQueryParameters2D::get_excluded_regions() const {
 	return r_regions;
 }
 
+void NavigationPathQueryParameters2D::set_included_links(const TypedArray<RID> &p_links) {
+	_included_links.resize(p_links.size());
+	for (uint32_t i = 0; i < _included_links.size(); i++) {
+		_included_links[i] = p_links[i];
+	}
+}
+
+TypedArray<RID> NavigationPathQueryParameters2D::get_included_links() const {
+	TypedArray<RID> r_links;
+	r_links.resize(_included_links.size());
+	for (uint32_t i = 0; i < _included_links.size(); i++) {
+		r_links[i] = _included_links[i];
+	}
+	return r_links;
+}
+
+void NavigationPathQueryParameters2D::set_excluded_links(const TypedArray<RID> &p_links) {
+	_excluded_links.resize(p_links.size());
+	for (uint32_t i = 0; i < _excluded_links.size(); i++) {
+		_excluded_links[i] = p_links[i];
+	}
+}
+
+TypedArray<RID> NavigationPathQueryParameters2D::get_excluded_links() const {
+	TypedArray<RID> r_links;
+	r_links.resize(_excluded_links.size());
+	for (uint32_t i = 0; i < _excluded_links.size(); i++) {
+		r_links[i] = _excluded_links[i];
+	}
+	return r_links;
+}
+
 void NavigationPathQueryParameters2D::set_path_return_max_length(float p_length) {
 	path_return_max_length = MAX(0.0, p_length);
 }
@@ -203,6 +235,12 @@ void NavigationPathQueryParameters2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_excluded_regions", "regions"), &NavigationPathQueryParameters2D::set_excluded_regions);
 	ClassDB::bind_method(D_METHOD("get_excluded_regions"), &NavigationPathQueryParameters2D::get_excluded_regions);
 
+	ClassDB::bind_method(D_METHOD("set_included_links", "links"), &NavigationPathQueryParameters2D::set_included_links);
+	ClassDB::bind_method(D_METHOD("get_included_links"), &NavigationPathQueryParameters2D::get_included_links);
+
+	ClassDB::bind_method(D_METHOD("set_excluded_links", "links"), &NavigationPathQueryParameters2D::set_excluded_links);
+	ClassDB::bind_method(D_METHOD("get_excluded_links"), &NavigationPathQueryParameters2D::get_excluded_links);
+
 	ClassDB::bind_method(D_METHOD("set_path_return_max_length", "length"), &NavigationPathQueryParameters2D::set_path_return_max_length);
 	ClassDB::bind_method(D_METHOD("get_path_return_max_length"), &NavigationPathQueryParameters2D::get_path_return_max_length);
 
@@ -226,6 +264,8 @@ void NavigationPathQueryParameters2D::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "simplify_epsilon"), "set_simplify_epsilon", "get_simplify_epsilon");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "excluded_regions", PROPERTY_HINT_ARRAY_TYPE, "RID"), "set_excluded_regions", "get_excluded_regions");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "included_regions", PROPERTY_HINT_ARRAY_TYPE, "RID"), "set_included_regions", "get_included_regions");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "excluded_links", PROPERTY_HINT_ARRAY_TYPE, "RID"), "set_excluded_links", "get_excluded_links");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "included_links", PROPERTY_HINT_ARRAY_TYPE, "RID"), "set_included_links", "get_included_links");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "path_return_max_length"), "set_path_return_max_length", "get_path_return_max_length");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "path_return_max_radius"), "set_path_return_max_radius", "get_path_return_max_radius");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "path_search_max_polygons"), "set_path_search_max_polygons", "get_path_search_max_polygons");

@@ -72,6 +72,8 @@ private:
 
 	LocalVector<RID> _excluded_regions;
 	LocalVector<RID> _included_regions;
+	LocalVector<RID> _excluded_links;
+	LocalVector<RID> _included_links;
 
 	float path_return_max_length = 0.0;
 	float path_return_max_radius = 0.0;
@@ -111,6 +113,12 @@ public:
 
 	void set_included_regions(const TypedArray<RID> &p_regions);
 	TypedArray<RID> get_included_regions() const;
+
+	void set_excluded_links(const TypedArray<RID> &p_links);
+	TypedArray<RID> get_excluded_links() const;
+
+	void set_included_links(const TypedArray<RID> &p_links);
+	TypedArray<RID> get_included_links() const;
 
 	void set_path_return_max_length(float p_length);
 	float get_path_return_max_length() const;
