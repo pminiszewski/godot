@@ -182,6 +182,29 @@ void NavMeshQueries2D::map_query_path(NavMap2D *p_map, const Ref<NavigationPathQ
 		}
 	}
 
+	const TypedArray<RID> &_excluded_links = p_query_parameters->get_excluded_links();
+	const TypedArray<RID> &_included_links = p_query_parameters->get_included_links();
+
+	uint32_t _excluded_link_count = _excluded_links.size();
+	uint32_t _included_link_count = _included_links.size();
+
+	query_task.exclude_links = _excluded_link_count > 0;
+	query_task.include_links = _included_link_count > 0;
+
+	if (query_task.exclude_links) {
+		query_task.excluded_links.resize(_excluded_link_count);
+		for (uint32_t i = 0; i < _excluded_link_count; i++) {
+			query_task.excluded_links[i] = _excluded_links[i];
+		}
+	}
+
+	if (query_task.include_links) {
+		query_task.included_links.resize(_included_link_count);
+		for (uint32_t i = 0; i < _included_link_count; i++) {
+			query_task.included_links[i] = _included_links[i];
+		}
+	}
+
 	switch (p_query_parameters->get_pathfinding_algorithm()) {
 		case NavigationPathQueryParameters2D::PathfindingAlgorithm::PATHFINDING_ALGORITHM_ASTAR: {
 			query_task.pathfinding_algorithm = PathfindingAlgorithm::PATHFINDING_ALGORITHM_ASTAR;
@@ -1154,7 +1177,7 @@ bool NavMeshQueries2D::_query_task_is_connection_owner_usable(const NavMeshPathQ
 		return owner_usable;
 	}
 
-	if (p_query_task.exclude_regions || p_query_task.include_regions) {
+	if (p_query_task.exclude_regions || p_query_task.include_regions || p_query_task.exclude_links || p_query_task.include_links) {
 		switch (p_owner->get_type()) {
 			case NavigationEnums2D::PathSegmentType::PATH_SEGMENT_TYPE_REGION: {
 				if (p_query_task.exclude_regions && p_query_task.excluded_regions.has(p_owner->get_self())) {
@@ -1166,21 +1189,30 @@ bool NavMeshQueries2D::_query_task_is_connection_owner_usable(const NavMeshPathQ
 				}
 			} break;
 			case NavigationEnums2D::PathSegmentType::PATH_SEGMENT_TYPE_LINK: {
-				const LocalVector<Polygon> &link_polygons = p_owner->get_navmesh_polygons();
-				if (link_polygons.size() != 2) {
-					// Not usable. Whatever this is, it is not a valid connected link.
+				if (p_query_task.exclude_regions || p_query_task.include_regions) {
+					const LocalVector<Polygon> &link_polygons = p_owner->get_navmesh_polygons();
+					if (link_polygons.size() != 2) {
+						// Not usable. Whatever this is, it is not a valid connected link.
+						owner_usable = false;
+					} else {
+						const RID link_start_region = link_polygons[0].owner->get_self();
+						const RID link_end_region = link_polygons[1].owner->get_self();
+						if (p_query_task.exclude_regions && (p_query_task.excluded_regions.has(link_start_region) || p_query_task.excluded_regions.has(link_end_region))) {
+							// Not usable. Exclude region filter is active and at least one region of the link is excluded.
+							owner_usable = false;
+						}
+						if (p_query_task.include_regions && (!p_query_task.included_regions.has(link_start_region) || !p_query_task.included_regions.has(link_end_region))) {
+							// Not usable. Include region filter is active and not both regions of the links are included.
+							owner_usable = false;
+						}
+					}
+				}
+				if (owner_usable && p_query_task.exclude_links && p_query_task.excluded_links.has(p_owner->get_self())) {
+					// Not usable. Exclude link filter is active and this link is excluded.
 					owner_usable = false;
-				} else {
-					const RID link_start_region = link_polygons[0].owner->get_self();
-					const RID link_end_region = link_polygons[1].owner->get_self();
-					if (p_query_task.exclude_regions && (p_query_task.excluded_regions.has(link_start_region) || p_query_task.excluded_regions.has(link_end_region))) {
-						// Not usable. Exclude region filter is active and at least one region of the link is excluded.
-						owner_usable = false;
-					}
-					if (p_query_task.include_regions && (!p_query_task.included_regions.has(link_start_region) || !p_query_task.excluded_regions.has(link_end_region))) {
-						// Not usable. Include region filter is active and not both regions of the links are included.
-						owner_usable = false;
-					}
+				} else if (owner_usable && p_query_task.include_links && !p_query_task.included_links.has(p_owner->get_self())) {
+					// Not usable. Include link filter is active and this link is not included.
+					owner_usable = false;
 				}
 			} break;
 		}

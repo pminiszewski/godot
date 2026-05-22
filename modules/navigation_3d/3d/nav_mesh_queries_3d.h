@@ -78,6 +78,11 @@ public:
 		LocalVector<RID> excluded_regions;
 		LocalVector<RID> included_regions;
 
+		bool exclude_links = false;
+		bool include_links = false;
+		LocalVector<RID> excluded_links;
+		LocalVector<RID> included_links;
+
 		float path_return_max_length = 0.0;
 		float path_return_max_radius = 0.0;
 		int path_search_max_polygons = NavigationDefaults3D::path_search_max_polygons;
